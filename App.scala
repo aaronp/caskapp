@@ -12,75 +12,15 @@ import java.time.LocalDate
 import scala.util.*
 
 /**
- * See https://metrics.dropwizard.io/4.1.2/getting-started.html
  */
 object App extends cask.MainRoutes {
 
-  case class CustomerRow(customerId: Long,
-                         firstName: String,
-                         lastName: String,
-                         dateOfBirth: LocalDate,
-                         email: String,
-                         postCode: String,
-                         mobile: String,
-                         telephone: String)
-  case class BulkUpdateRequest(updates: Seq[CustomerRow], deletes: Set[Long])
+  @cask.staticFiles("/ui", headers = Seq("Cache-Control" -> "max-age=31536000"))
+  def staticFileRoutes() = "web"
 
-  private var byId = Map[Long, CustomerRow]()
-  object Lock
 
-  private def applyUpdate(request : BulkUpdateRequest) : Try[String] = Try {
-    Lock.synchronized {
-      val newMap = request.updates.foldLeft(byId) {
-        case (map, update) =>
-          map.updated(update.customerId, update)
-      }
-      byId = newMap -- request.deletes
-
-      Map(
-        "updates" -> request.updates.size.asJson,
-        "deletes" -> request.deletes.size.asJson,
-        "total" -> byId.size.asJson
-      ).asJson.noSpaces
-    }
-  }
-
-  @cask.put("/customer/v1/update")
-  def update(request: cask.Request) = {
-    val responseTry = for {
-      json <- io.circe.parser.parse(request.text()).toTry
-      request <- json.as[BulkUpdateRequest].toTry
-      response <- applyUpdate(request)
-    } yield response
-
-    responseTry match {
-      case Success(result) => result
-      case Failure(err) => Map("error" -> err.toString.asJson).asJson.noSpaces
-    }
-  }
-
-  def testData = CustomerRow(1,"name", "last", LocalDate.of(1,2,3), "e@mail.com", "postcode", "mobile", "tel")
-
-  @cask.get("/")
-  def usage() =
-    s"""# create
-       |curl -X PUT -d '${BulkUpdateRequest(Seq(testData), Set(20)).asJson.noSpaces}' http://localhost:8080//customer/v1/update
-       |
-       |# get
-       |curl http://localhost:8080/get/12
-       |
-       |# list page / limit
-       |curl http://localhost:8080/list/0/10
-       |""".stripMargin
-
-  @cask.get("/get/:id")
-  def getId(id : Long) = byId.get(id).map(_.asJson).getOrElse(Json.Null).noSpaces
-
-  @cask.get("/list/:page/:limit")
-  def list(page : Int, limit : Int) = {
-    val offset = page * limit
-    byId.toList.sortBy(_._1).drop(offset).take(limit).map(_._2).toList.asJson.noSpaces
-  }
+  @cask.staticFiles("/data")
+  def data() = "data"
 
   private def box(str : String): String = {
     val lines = str.linesIterator.toList
@@ -93,7 +33,7 @@ object App extends cask.MainRoutes {
   }
 
   override def host: String = "0.0.0.0"
-  override def port = 8085
+  override def port = 8080
 
   initialize()
 
