@@ -2,5 +2,5 @@
 
 ## Usage:
 
-docker build . -tag myapp
+docker build . -t myapp
  
