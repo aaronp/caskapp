@@ -14,12 +14,14 @@ object Confluence {
 
   case class Client(user : String, pwd: String) {
     override def toString = s"Client($user, ${pwd.map(_ => '*')})"
-    private def credentialsString = s"$user:$pwd"
-    private def auth = java.util.Base64.getEncoder.encode(credentialsString.getBytes("UTF-8"))
+//    private def credentialsString = s"$user:$pwd"
+//    private def auth = java.util.Base64.getEncoder.encode(credentialsString.getBytes("UTF-8"))
     def spaces = {
-      val r = requests.get(globalSpacesUrl, headers= Map("Authorization" -> s"Basic $auth"))
-      println(r.text)
-      r.text
+      val r = requests.get(globalSpacesUrl,
+        auth = requests.RequestAuth.Basic(user, pwd))
+      println(r)
+      println(r.getClass)
+      
     }
   }
   object Client {
