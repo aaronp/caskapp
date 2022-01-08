@@ -3,7 +3,6 @@
 // using lib io.circe::circe-core:0.14.1
 // using lib io.circe::circe-generic:0.14.1
 // using lib io.circe::circe-parser:0.14.1
-
 import io.circe.syntax.*
 import io.circe.*
 import io.circe.generic.auto.*

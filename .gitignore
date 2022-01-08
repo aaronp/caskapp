@@ -3,3 +3,7 @@ target
 app.jar
 .scala
 .idea
+.metals
+.vscode
+project/project
+.bloop
