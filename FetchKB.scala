@@ -1,16 +1,18 @@
 // using scala 3.0.2
 // using lib com.lihaoyi::requests:0.7.0
+// using lib io.circe::circe-generic:0.15.0-M1
+// using lib io.circe::circe-parser:0.15.0-M1
 
-//import io.circe.parser.*
+import io.circe.parser.*
 
 object Confluence {
 
-  // io.circe::circe-generic:0.14.1
-  // io.circe::circe-parser:0.14.1
-  def globalSpacesUrl = "https://nimbledelivery.atlassian.net/wiki/rest/api/space?type=global"
-  def spaceUrl(spaceKey : String, offset : Int, limit :Int) =
-    s"https://nimbledelivery.atlassian.net/wiki/rest/api/space/$spaceKey/content?start=$offset&limit=$limit&depth=all&expand=ancestors,childType.pages"
+  
+  // def globalSpacesUrl = "https://nimbledelivery.atlassian.net/wiki/rest/api/space?type=global"
+  // def spaceUrl(spaceKey : String, offset : Int, limit :Int) =
+  //   s"https://nimbledelivery.atlassian.net/wiki/rest/api/space/$spaceKey/content?start=$offset&limit=$limit&depth=all&expand=ancestors,childType.pages"
 
+  def allSpaces = "https://nimbledelivery.atlassian.net/wiki/rest/api/space/DEV/content?depth=all&expand=ancestors,childType.pages"
 
   case class Client(user : String, pwd: String) {
     override def toString = s"Client($user, ${pwd.map(_ => '*')})"
@@ -18,8 +20,8 @@ object Confluence {
 //    private def auth = java.util.Base64.getEncoder.encode(credentialsString.getBytes("UTF-8"))
     def basicAuth = requests.RequestAuth.Basic(user, pwd)
     def spaces = {
-      val r = requests.get(globalSpacesUrl, auth = basicAuth)
-      println(r)
+      val r = requests.get(allSpaces, auth = basicAuth)
+      println(r.text)
       println(r.getClass)
       
     }
