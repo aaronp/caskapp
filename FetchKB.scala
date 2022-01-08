@@ -16,9 +16,9 @@ object Confluence {
     override def toString = s"Client($user, ${pwd.map(_ => '*')})"
 //    private def credentialsString = s"$user:$pwd"
 //    private def auth = java.util.Base64.getEncoder.encode(credentialsString.getBytes("UTF-8"))
+    def basicAuth = requests.RequestAuth.Basic(user, pwd)
     def spaces = {
-      val r = requests.get(globalSpacesUrl,
-        auth = requests.RequestAuth.Basic(user, pwd))
+      val r = requests.get(globalSpacesUrl, auth = basicAuth)
       println(r)
       println(r.getClass)
       
