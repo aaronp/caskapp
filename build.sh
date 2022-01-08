@@ -31,6 +31,11 @@ function debug() {
   scala-cli App.scala
 }
 
+# https://scala-cli.virtuslab.org/docs/commands/setup-ide
+function ide() {
+  scala-cli setup-ide . --scala 3.1.0
+}
+
 # just for convenience in running the instrumented fat-jar locally
 # source ./build.sh && run
 function run() {
